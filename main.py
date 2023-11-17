@@ -10,7 +10,7 @@ def loadAugImages(path):
     augDics = {}
     for imgPath in myList:
         key = int(os.path.splitext(imgPath)[0])
-        imgAug = cv2.imread(f'{path / imgPath}')
+        imgAug = cv2.imread(f'{path}+ / {imgPath}')
         augDics[key] = imgAug
         return augDics
 
