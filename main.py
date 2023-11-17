@@ -9,9 +9,11 @@ def loadAugImages(path):
     noOfMarkers = len(myList)
     augDics = {}
     for imgPath in myList:
+        # print(imgPath)
         key = int(os.path.splitext(imgPath)[0])
-        imgAug = cv2.imread(f'{path}+ / {imgPath}')
+        imgAug = cv2.imread(f'{path}/{imgPath}')
         augDics[key] = imgAug
+        # print(augDics)
         return augDics
 
 
@@ -28,7 +30,7 @@ def findArucoMarkers(img, markerSize=4, totalMarkers=250, draw=True):
 
     bbox, ids, rejected = detector.detectMarkers(imgGray)
 
-#     print(ids, bbox)
+    # print(ids, bbox)
     if draw:
         aruco.drawDetectedMarkers(img, bbox)
 
@@ -36,23 +38,25 @@ def findArucoMarkers(img, markerSize=4, totalMarkers=250, draw=True):
 
 
 def augmentAruco(bbox, id, img, imgAug, drawId=True):
-    print(bbox)
+    # print(bbox)
 
     tl = bbox[0][0][0], bbox[0][0][1]
     tr = bbox[0][1][0], bbox[0][1][1]
     br = bbox[0][2][0], bbox[0][2][1]
     bl = bbox[0][3][0], bbox[0][3][1]
-    print(tl)
+    # print(tl)
 
     h, w, c = imgAug.shape
     pts1 = np.array([tl, tr, br, bl])
+    print(pts1)
     pts2 = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
     matrix, _ = cv2.findHomography(pts2, pts1)
     imgOut = cv2.warpPerspective(imgAug, matrix, (img.shape[1], img.shape[0]))
     cv2.fillConvexPoly(img, pts1.astype(int), (0, 0, 0))
+    # cv2.fillPoly(img, [pts1.astype(int)], (0, 0, 0))
     imgOut = img + imgOut
     if drawId:
-        cv2.putText(imgOut, str(id), tl,
+        cv2.putText(imgOut, str(id), (int(tl[0]), int(tl[1])),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
 
     return imgOut
